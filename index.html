@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a1b26" />
+    <meta name="description" content="비주얼 노벨 니유 선배?" />
+    <title>니유 선배?</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="app" class="app-shell">
+      <section id="loading-screen" class="screen loading-screen is-active" aria-label="불러오는 중">
+        <div class="loading-grain" aria-hidden="true"></div>
+        <div class="loading-card">
+          <div class="loading-emblem" aria-hidden="true"><span>?</span></div>
+          <p class="loading-kicker">NEEYU SENPAI?</p>
+          <h1>기억을 불러오는 중</h1>
+          <div class="loading-track" aria-hidden="true">
+            <span id="loading-bar"></span>
+          </div>
+          <div class="loading-meta">
+            <span id="loading-status" aria-live="polite">장면을 준비하고 있어요</span>
+            <strong id="loading-percent">0%</strong>
+          </div>
+        </div>
+      </section>
+
+      <section id="title-screen" class="screen title-screen" aria-label="메인 화면">
+        <div class="title-bg" aria-hidden="true"></div>
+        <div class="title-shade" aria-hidden="true"></div>
+        <div class="title-content">
+          <p class="title-eyebrow">A SMALL ACCIDENT, A STRANGE FIRST MEETING</p>
+          <h1 class="game-title" aria-label="니유 선배?">
+            <span class="title-piece title-neeyu">니유</span>
+            <span class="title-piece title-senpai">선배</span>
+            <span class="title-piece title-question">?</span>
+          </h1>
+        </div>
+        <nav class="title-actions" aria-label="메인 메뉴">
+          <button id="start-button" class="menu-button menu-start" type="button">
+            <span class="menu-index">01</span>
+            <span><b>게임 시작</b><small>처음부터 이야기 시작하기</small></span>
+          </button>
+          <button id="gallery-button" class="menu-button menu-gallery is-locked" type="button" disabled>
+            <span><b>이미지 보기</b><small id="gallery-button-copy">게임에서 이미지를 발견하면 열려요</small></span>
+            <span class="menu-index" id="gallery-count">00</span>
+          </button>
+        </nav>
+        <p class="title-version">PROLOGUE · v0.1</p>
+      </section>
+
+      <section id="game-screen" class="screen game-screen" aria-label="게임 화면">
+        <div class="scene-stage" id="scene-stage">
+          <div class="scene-fallback" aria-hidden="true"></div>
+          <img id="scene-bg" class="scene-bg" alt="" />
+          <img id="scene-sprite" class="scene-sprite" alt="" />
+          <div class="scene-vignette" aria-hidden="true"></div>
+          <div id="scene-curtain" class="scene-curtain" aria-hidden="true"></div>
+        </div>
+
+        <header class="game-toolbar">
+          <button id="home-button" class="round-button" type="button" aria-label="메인 화면으로">⌂</button>
+          <div class="chapter-label"><span>PROLOGUE</span><b>첫 만남(?)</b></div>
+          <button id="game-gallery-button" class="text-button" type="button">IMAGE <span id="game-gallery-count">00</span></button>
+        </header>
+
+        <button id="advance-area" class="advance-area" type="button" aria-label="다음 대사"></button>
+
+        <div id="dialogue-box" class="dialogue-box">
+          <div id="speaker-name" class="speaker-name">나</div>
+          <p id="dialogue-text" class="dialogue-text"></p>
+          <button id="next-button" class="next-button" type="button" aria-label="다음">⌄</button>
+          <div class="dialogue-help">클릭 · Enter · Space</div>
+        </div>
+
+        <section id="end-card" class="end-card" aria-label="프롤로그 완료">
+          <p>PROLOGUE COMPLETE</p>
+          <h2>그게, 그 사람과의<br />첫 만남이었다.</h2>
+          <div class="end-actions">
+            <button id="end-gallery-button" type="button">해금 이미지 보기</button>
+            <button id="end-home-button" type="button">메인 화면</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="name-dialog" class="modal name-modal">
+      <form id="name-form" method="dialog" class="modal-card">
+        <p class="modal-kicker">BEFORE WE BEGIN</p>
+        <h2>당신의 이름은?</h2>
+        <p>이야기 속 이름 칸에 표시될 닉네임을 정해주세요.</p>
+        <label for="nickname">닉네임</label>
+        <input id="nickname" name="nickname" type="text" maxlength="12" autocomplete="nickname" placeholder="이름을 입력하세요" required />
+        <div class="modal-actions">
+          <button id="name-cancel" class="button-ghost" type="button">돌아가기</button>
+          <button class="button-primary" type="submit">이 이름으로 시작</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="gallery-dialog" class="modal gallery-modal">
+      <section class="gallery-panel">
+        <header class="gallery-header">
+          <div>
+            <p class="modal-kicker">MEMORIES</p>
+            <h2>이미지 보기</h2>
+          </div>
+          <button id="gallery-close" class="round-button modal-close" type="button" aria-label="닫기">×</button>
+        </header>
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </section>
+    </dialog>
+
+    <dialog id="image-dialog" class="modal image-modal">
+      <figure class="image-viewer">
+        <img id="viewer-image" alt="해금 이미지 크게 보기" />
+        <figcaption id="viewer-caption"></figcaption>
+        <button id="viewer-close" class="round-button modal-close" type="button" aria-label="닫기">×</button>
+      </figure>
+    </dialog>
+
+    <audio id="sfx-squeak" preload="auto" src="data/sound/01_squeak.mp3"></audio>
+    <audio id="sfx-bang" preload="auto" src="data/sound/02_bang.mp3"></audio>
+    <script src="game.js"></script>
+  </body>
+</html>
