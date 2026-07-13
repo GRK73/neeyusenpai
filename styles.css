@@ -183,7 +183,7 @@ input:focus-visible {
 .title-bg {
   background:
     linear-gradient(150deg, rgba(86, 126, 129, 0.25), rgba(171, 125, 90, 0.2)),
-    url("https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/01_road.png") center / cover no-repeat;
+    url("https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/01_road.png") center / cover no-repeat;
   transform: scale(1.03);
   animation: title-drift 14s ease-in-out infinite alternate;
 }

@@ -1,4 +1,4 @@
-const R2 = "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/";
+const R2 = "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/";
 
 const images = [
   { id: "road", label: "언덕길", url: `${R2}01_road.png` },

@@ -2,7 +2,7 @@
 
 ## 프롤로그 — 첫 만남(?)
 
-![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/01_road.png)
+![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/01_road.png)
 
 아침 8시 40분. 1교시 강의까지는 딱 20분.
 
@@ -18,8 +18,8 @@
 
 그리고, 봤다.
 
-(원래 화면(https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/01_road.png)에서 약간의 옆으로 돌리는 효과 후)
-![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/01_bike_charge.png)
+(원래 화면(https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/01_road.png)에서 약간의 옆으로 돌리는 효과 후)
+![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/01_bike_charge.png)
 
 내리막 저편에서, 자전거 한 대가 나를 향해 돌진하고 있었다.
 
@@ -33,14 +33,14 @@
 
 ...
 
----(약간 눈 깜빡거리는 이펙트와 함께 뿌연 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/02_hospital_wake_1.png")
+---(약간 눈 깜빡거리는 이펙트와 함께 뿌연 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/02_hospital_wake_1.png")
 
 시야가 하얗다.
 
 아니, 하얀 게 아니라 — 누군가의 얼굴이 너무 가까이 있어서 초점이 안 맞는 거였다.
 
 (이미지 선명해짐)
-![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/02_hospital_wake_1.png)
+![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/02_hospital_wake_1.png)
 
 천천히, 세상이 형태를 되찾는다. 형광등. 낯선 천장. 소독약 냄새. 그리고 코앞에서 나를 들여다보고 있는, 한 여자애의 얼굴.
 
@@ -54,7 +54,7 @@
 
 ...뭐?
 
-![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/02_hospital_wake_2.png)
+![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/02_hospital_wake_2.png)
 
 > "살아있어! 다행이다, 진짜, 저 방금 인생에서 제일 빠르게 달렸거든요. 구급차보다 제가 먼저 도착했어요. 아 근데 그건 자랑이 아니고—"
 
@@ -62,13 +62,13 @@
 
 방금 나를 친 사람이, 나보다 더 정신없어 보였다.
 
----(천천히 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/02_hospital.png"로 변경 + 중앙에 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/기본.png")
+---(천천히 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/02_hospital.png"로 변경 + 중앙에 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/기본.png")
 
 > "그러니까, 정리하면요."
 
 그 사람은 손가락을 하나씩 접어가며 말했다. 접는 순서가 엄지, 검지가 아니라 약지부터라는 게 어딘가 불안했다.
 
-("https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/기본.png" ->  "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/애매.png")
+("https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/기본.png" ->  "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/애매.png")
 
 > "제가 언덕에서 브레이크가 고장 났고, 그쪽을 쳤고, 그쪽은 다리에 금이 갔고, 그래서 지금 여기 있고—"
 
@@ -95,7 +95,7 @@
 > "어, 잠깐—"
 
 (잠깐 화면이 검정색이 되었다가 다시 밝아지면서)
-![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/03_palm_number.png)
+![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/03_palm_number.png)
 
 말릴 새도 없이, 손바닥에 펜이 닿았다. 차갑고 간지러운 감촉. 숫자 열한 개가 삐뚤빼뚤하게 적혀 내려갔다. 펜을 쥔 손은 정신없어 보였는데, 이상하게 글씨 쓰는 동안엔 눈빛이 진지했다.
 
@@ -103,20 +103,20 @@
 
 다 쓰고 나서, 그 사람은 만족스러운 표정으로 내 손을 놓았다. 손바닥이 아직 따뜻했다.
 
-(다시 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/02_hospital.png"로 변경 + 중앙에 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/웃음.png")
+(다시 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/02_hospital.png"로 변경 + 중앙에 "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/웃음.png")
 
 > "이름은—"
 > "연락해요!"
 
 내 질문을 자르듯, 그 사람은 벌써 문 쪽으로 걸어가며 손을 흔들었다. 그러곤 나가버렸다.
 
-(문 쾅 소리 + "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/기본.png"사라지기 =  "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/02_hospital.png"만 남음)
+(문 쾅 소리 + "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/기본.png"사라지기 =  "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/02_hospital.png"만 남음)
 
 문이 닫히고, 병실엔 나 혼자 남았다.
 
 나는 손바닥을 내려다봤다. 
 
-![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/neeyu/04_palm.png)
+![](https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/04_palm.png)
 
 삐뚤빼뚤한 번호. 이름도 모르는 사람의 연락처가, 잉크로 남아 있었다.
 
