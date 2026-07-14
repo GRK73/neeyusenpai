@@ -19,6 +19,9 @@ images.forEach((image) => {
 });
 
 const byId = Object.fromEntries(images.map((image) => [image.id, image]));
+const galleryImageIds = new Set(["road", "bike", "wake1", "wake2", "hospital", "number", "palm"]);
+const galleryImages = images.filter((image) => galleryImageIds.has(image.id));
+const UNLOCK_STORAGE_KEY = "neeyu.gallery-unlocked.v2";
 
 const story = [
   { bg: "road", text: "아침 8시 40분. 1교시 강의까지는 딱 20분." },
@@ -90,11 +93,11 @@ const imageDialog = $("#image-dialog");
 let nickname = localStorage.getItem("neeyu.nickname") || "";
 let savedUnlocks = [];
 try {
-  savedUnlocks = JSON.parse(localStorage.getItem("neeyu.unlocked") || "[]");
+  savedUnlocks = JSON.parse(localStorage.getItem(UNLOCK_STORAGE_KEY) || "[]");
 } catch {
-  localStorage.removeItem("neeyu.unlocked");
+  localStorage.removeItem(UNLOCK_STORAGE_KEY);
 }
-let unlocked = new Set(savedUnlocks.filter((id) => byId[id]));
+let unlocked = new Set(savedUnlocks.filter((id) => galleryImageIds.has(id)));
 let storyIndex = 0;
 let currentBg = "";
 let currentSprite = "";
@@ -145,11 +148,11 @@ async function preloadAssets() {
 }
 
 function saveUnlocks() {
-  localStorage.setItem("neeyu.unlocked", JSON.stringify([...unlocked]));
+  localStorage.setItem(UNLOCK_STORAGE_KEY, JSON.stringify([...unlocked]));
 }
 
 function unlockImage(id) {
-  if (!id || !byId[id] || unlocked.has(id)) return;
+  if (!galleryImageIds.has(id) || unlocked.has(id)) return;
   unlocked.add(id);
   saveUnlocks();
   updateGalleryState();
@@ -162,13 +165,13 @@ function updateGalleryState() {
   galleryButton.classList.toggle("is-locked", count === 0);
   $("#gallery-count").textContent = String(count).padStart(2, "0");
   $("#game-gallery-count").textContent = String(count).padStart(2, "0");
-  $("#gallery-button-copy").textContent = count ? `${images.length}장 중 ${count}장 해금` : "게임에서 이미지를 발견하면 열려요";
+  $("#gallery-button-copy").textContent = count ? `${galleryImages.length}장 중 ${count}장 해금` : "게임에서 이미지를 발견하면 열려요";
 }
 
 function renderGallery() {
   const grid = $("#gallery-grid");
   grid.replaceChildren();
-  images.forEach((item, index) => {
+  galleryImages.forEach((item, index) => {
     const isUnlocked = unlocked.has(item.id);
     const button = document.createElement("button");
     button.type = "button";

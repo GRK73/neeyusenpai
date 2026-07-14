@@ -201,26 +201,20 @@ input:focus-visible {
   transform: translateX(-50%);
 }
 
-.title-eyebrow {
-  margin: 0 0 20px;
-  font-family: Arial, sans-serif;
-  font-size: clamp(8px, 1vw, 11px);
-  font-weight: 700;
-  letter-spacing: 0.35em;
-  opacity: 0;
-}
-
 .game-title {
   display: flex;
   align-items: baseline;
   justify-content: center;
   margin: 0;
+  color: #e52d36;
   font-family: "KerisKedu", "Malgun Gothic", sans-serif;
   font-size: clamp(72px, 11vw, 164px);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.06em;
-  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.24);
+  -webkit-text-stroke: clamp(2px, 0.26vw, 4px) #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
 }
 
 .title-piece {
@@ -229,15 +223,12 @@ input:focus-visible {
   transform: translateY(-52vh);
 }
 
-.title-screen.animate-title .title-eyebrow {
-  animation: eyebrow-in 0.8s 2s ease forwards;
-}
-
 .title-screen.animate-title .title-neeyu {
   animation: title-drop 0.7s 0.15s cubic-bezier(0.2, 0.78, 0.3, 1.18) forwards;
 }
 
 .title-screen.animate-title .title-senpai {
+  margin-left: 0.08em;
   animation: title-drop 0.7s 0.45s cubic-bezier(0.2, 0.78, 0.3, 1.18) forwards;
 }
 
@@ -259,10 +250,6 @@ input:focus-visible {
 @keyframes question-fall {
   from { opacity: 1; transform: rotate(0deg); }
   to { opacity: 1; transform: rotate(45deg); }
-}
-
-@keyframes eyebrow-in {
-  to { opacity: 0.75; }
 }
 
 .title-actions {
@@ -700,7 +687,6 @@ input:focus-visible {
 
 @media (max-width: 720px) {
   .title-content { top: 18%; }
-  .title-eyebrow { line-height: 1.6; }
   .title-actions { right: 22px; bottom: 44px; left: 22px; flex-direction: column; align-items: stretch; gap: 4px; }
   .menu-button { width: 100%; min-height: 74px; }
   .menu-gallery { justify-content: space-between; }
