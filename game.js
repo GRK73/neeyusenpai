@@ -1,4 +1,5 @@
 const R2 = "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/";
+const R2_VERSION = "20260714-1920x1088";
 
 const images = [
   { id: "road", label: "언덕길", url: `${R2}01_road.png` },
@@ -12,6 +13,10 @@ const images = [
   { id: "number", label: "손바닥 위 번호", url: `${R2}03_palm_number.png` },
   { id: "palm", label: "남겨진 연락처", url: `${R2}04_palm.png` },
 ];
+
+images.forEach((image) => {
+  image.url = `${image.url}?v=${R2_VERSION}`;
+});
 
 const byId = Object.fromEntries(images.map((image) => [image.id, image]));
 
