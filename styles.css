@@ -5,6 +5,15 @@
 }
 
 @font-face {
+  font-family: "KerisKedu Regular";
+  src:
+    url("data/KERISKEDU_R.otf") format("opentype"),
+    url("data/KERISKEDU_R.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Dunggeunmiso";
   src: url("data/Hakgyoansim Dunggeunmiso TTF B.ttf") format("truetype");
   font-display: swap;
@@ -207,12 +216,12 @@ input:focus-visible {
   justify-content: center;
   margin: 0;
   color: #e52d36;
-  font-family: "KerisKedu", "Malgun Gothic", sans-serif;
+  font-family: "KerisKedu Regular", "Malgun Gothic", sans-serif;
   font-size: clamp(72px, 11vw, 164px);
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.06em;
-  -webkit-text-stroke: clamp(2px, 0.26vw, 4px) #fff;
+  -webkit-text-stroke: clamp(3px, 0.34vw, 5px) #fff;
   paint-order: stroke fill;
   text-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
 }
