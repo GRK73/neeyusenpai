@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a1b26" />
     <meta name="description" content="비주얼 노벨 니유 선배?" />
     <title>니유 선배?</title>
-    <link rel="stylesheet" href="styles.css?v=20260714-title-bold" />
+    <link rel="stylesheet" href="styles.css?v=20260716-ch04" />
   </head>
   <body>
     <main id="app" class="app-shell">
@@ -46,21 +46,22 @@
             <span class="menu-index" id="gallery-count">00</span>
           </button>
         </nav>
-        <p class="title-version">PROLOGUE · v0.1</p>
+        <p class="title-version">CHAPTER 04 · v0.4</p>
       </section>
 
       <section id="game-screen" class="screen game-screen" aria-label="게임 화면">
         <div class="scene-stage" id="scene-stage">
           <div class="scene-fallback" aria-hidden="true"></div>
           <img id="scene-bg" class="scene-bg" alt="" />
-          <img id="scene-sprite" class="scene-sprite" alt="" />
+          <img id="scene-sprite-a" class="scene-sprite" alt="" />
+          <img id="scene-sprite-b" class="scene-sprite" alt="" />
           <div class="scene-vignette" aria-hidden="true"></div>
           <div id="scene-curtain" class="scene-curtain" aria-hidden="true"></div>
         </div>
 
         <header class="game-toolbar">
           <button id="home-button" class="round-button" type="button" aria-label="메인 화면으로">⌂</button>
-          <div class="chapter-label"><span>PROLOGUE</span><b>첫 만남(?)</b></div>
+          <div class="chapter-label"><span id="chapter-eyebrow">PROLOGUE</span><b id="chapter-title">첫 만남(?)</b></div>
           <button id="game-gallery-button" class="text-button" type="button">IMAGE <span id="game-gallery-count">00</span></button>
         </header>
 
@@ -73,9 +74,14 @@
           <div class="dialogue-help">클릭 · Enter · Space</div>
         </div>
 
-        <section id="end-card" class="end-card" aria-label="프롤로그 완료">
-          <p>PROLOGUE COMPLETE</p>
-          <h2>그게, 그 사람과의<br />첫 만남이었다.</h2>
+        <section id="choice-panel" class="choice-panel" aria-label="선택지" hidden>
+          <p id="choice-title"></p>
+          <div id="choice-buttons" class="choice-buttons"></div>
+        </section>
+
+        <section id="end-card" class="end-card" aria-label="4장 완료">
+          <p>CHAPTER 04 COMPLETE</p>
+          <h2>우리 둘 다, 넷째 컷이<br />남는 쪽으로 잘랐다.</h2>
           <div class="end-actions">
             <button id="end-gallery-button" type="button">해금 이미지 보기</button>
             <button id="end-home-button" type="button">메인 화면</button>
@@ -121,6 +127,7 @@
 
     <audio id="sfx-squeak" preload="auto" src="data/sound/01_squeak.mp3"></audio>
     <audio id="sfx-bang" preload="auto" src="data/sound/02_bang.mp3"></audio>
-    <script src="game.js"></script>
+    <script src="story-data.js?v=20260716-ch04"></script>
+    <script src="game.js?v=20260716-ch04"></script>
   </body>
 </html>

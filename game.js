@@ -1,90 +1,266 @@
 const R2 = "https://pub-51e0a21b82b94533b988af3a0dfe4c04.r2.dev/";
-const R2_VERSION = "20260714-1920x1088";
+const R2_VERSION = "20260716-ch04";
 
-const images = [
-  { id: "road", label: "언덕길", url: `${R2}01_road.png` },
-  { id: "bike", label: "돌진", url: `${R2}01_bike_charge.png` },
-  { id: "wake1", label: "눈을 뜨면", url: `${R2}02_hospital_wake_1.png` },
-  { id: "wake2", label: "살아있어!", url: `${R2}02_hospital_wake_2.png` },
-  { id: "hospital", label: "병실", url: `${R2}02_hospital.png` },
-  { id: "normal", label: "의문의 여자", url: `${R2}기본.png` },
-  { id: "awkward", label: "애매한 표정", url: `${R2}애매.png` },
-  { id: "smile", label: "웃음", url: `${R2}웃음.png` },
-  { id: "number", label: "손바닥 위 번호", url: `${R2}03_palm_number.png` },
-  { id: "palm", label: "남겨진 연락처", url: `${R2}04_palm.png` },
-];
-
-images.forEach((image) => {
-  image.url = `${image.url}?v=${R2_VERSION}`;
+const asset = (id, file, label, kind) => ({
+  id,
+  file,
+  label,
+  kind,
+  url: `${R2}${file}.png?v=${R2_VERSION}`,
 });
 
-const byId = Object.fromEntries(images.map((image) => [image.id, image]));
-const galleryImageIds = new Set(["road", "bike", "wake1", "wake2", "hospital", "number", "palm"]);
-const galleryImages = images.filter((image) => galleryImageIds.has(image.id));
-const UNLOCK_STORAGE_KEY = "neeyu.gallery-unlocked.v2";
+const images = [
+  asset("bg_clubroom", "bg_clubroom", "동아리실", "background"),
+  asset("bg_festival", "bg_festival", "축제 거리", "background"),
+  asset("bg_festivalbooth", "bg_festivalbooth", "축제 부스 내부", "background"),
+  asset("bg_hospital", "bg_hospital", "병원", "background"),
+  asset("bg_road", "bg_road", "일반 길", "background"),
+  asset("bg_school", "bg_school", "학교 복도", "background"),
 
-const story = [
-  { bg: "road", text: "아침 8시 40분. 1교시 강의까지는 딱 20분." },
-  { text: "헤드셋 너머로 흘러나오는 음악이 세상의 볼륨을 반쯤 줄여준다. 이어폰이 아니라 헤드셋을 고집하는 이유가 이거다. 세상이 조용해지니까." },
-  { text: "오늘 발표 순서 세 번째였나, 네 번째였나….", thought: true },
-  { text: "그런 시답잖은 걸 생각하며 언덕길을 오르고 있었다. 평화로웠다. 적어도 그 소리를 듣기 전까지는." },
-  { text: "끼이이이익!", sound: "squeak", effect: "shake", thought: true },
-  { text: "헤드셋을 뚫고 들어올 정도의 소리. 금속이 비명을 지르는 것 같은. 나는 반사적으로 뒤를 돌아봤다." },
-  { text: "그리고, 봤다." },
-  { bg: "bike", text: "내리막 저편에서, 자전거 한 대가 나를 향해 돌진하고 있었다.", effect: "turn" },
-  { text: "안장 위에는 여자애 하나가 타고 있었는데—페달을 밟는 것도, 브레이크를 잡는 것도 아니고, 그냥 두 손으로 핸들을 붙든 채 눈을 질끈 감고 있었다." },
-  { text: "이상하게도, 그 짧은 순간에 나는 딴생각을 했다." },
-  { text: "아, 저 표정. 브레이크가 고장 났—", thought: true },
-  { text: "……", sound: "bang", effect: "black" },
-  { bg: "wake1", blur: true, text: "시야가 하얗다.", effect: "blink" },
-  { text: "아니, 하얀 게 아니라—누군가의 얼굴이 너무 가까이 있어서 초점이 안 맞는 거였다." },
-  { blur: false, text: "천천히, 세상이 형태를 되찾는다. 형광등. 낯선 천장. 소독약 냄새. 그리고 코앞에서 나를 들여다보고 있는, 한 여자애의 얼굴." },
-  { text: "눈썹은 산처럼 팔자로 휘어 있고, 눈은 금방이라도 울 것처럼 그렁그렁했다. 세상 모든 걱정을 혼자 짊어진 것 같은 표정." },
-  { text: "우리는 몇 초간 그렇게 눈만 마주쳤다. 그리고 그 사람이 입을 열었다." },
-  { speaker: "girl", text: "…살아있다." },
-  { text: "…뭐?" },
-  { bg: "wake2", speaker: "girl", text: "살아있어! 다행이다, 진짜, 저 방금 인생에서 제일 빠르게 달렸거든요. 구급차보다 제가 먼저 도착했어요. 아, 근데 그건 자랑이 아니고—" },
-  { text: "이 사람 뭐지.", thought: true },
-  { text: "방금 나를 친 사람이, 나보다 더 정신없어 보였다." },
-  { bg: "hospital", sprite: "normal", speaker: "girl", text: "그러니까, 정리하면요." },
-  { text: "그 사람은 손가락을 하나씩 접어가며 말했다. 접는 순서가 엄지, 검지가 아니라 약지부터라는 게 어딘가 불안했다." },
-  { sprite: "awkward", speaker: "girl", text: "제가 언덕에서 브레이크가 고장 났고, 그쪽을 쳤고, 그쪽은 다리에 금이 갔고, 그래서 지금 여기 있고—" },
-  { text: "접었던 손가락을 활짝 펴며, 그 사람은 선언하듯 말했다. 무슨 대단한 결심이라도 한 표정으로." },
-  { speaker: "girl", text: "—그래서 제가 책임질게요." },
-  { text: "네? 무슨 책임을요." },
-  { speaker: "girl", text: "몰라요." },
-  { text: "…몰라?", thought: true },
-  { speaker: "girl", text: "근데 책임진다는 말은, 이럴 때 하는 거잖아요. 만화에서 봤어요." },
-  { text: "뭐라고 대꾸해야 할지 몰라서, 일단 제일 궁금한 걸 물었다." },
-  { text: "…누구세요?" },
-  { text: "그 사람은 잠깐 멈칫하더니, 뭔가 대답하려다 말고 갑자기 주변을 두리번거렸다. 메모지나 펜 같은 걸 찾는 것 같았다." },
-  { text: "그런데 협탁엔 펜만 있고 쓸 만한 종이가 없었다. 잠깐 고민하던 그 사람은—내 손을 덥석 잡았다." },
-  { text: "어, 잠깐—" },
-  { bg: "number", sprite: null, text: "말릴 새도 없이 손바닥에 펜이 닿았다. 차갑고 간지러운 감촉. 숫자 열한 개가 삐뚤빼뚤하게 적혀 내려갔다.", effect: "black" },
-  { text: "펜을 쥔 손은 정신없어 보였는데, 이상하게 글씨를 쓰는 동안엔 눈빛이 진지했다." },
-  { speaker: "girl", text: "치료비든 뭐든, 필요한 거 생기면 연락해요. 진짜로." },
-  { text: "다 쓰고 나서, 그 사람은 만족스러운 표정으로 내 손을 놓았다. 손바닥이 아직 따뜻했다." },
-  { bg: "hospital", sprite: "smile", text: "이름은—" },
-  { speaker: "girl", text: "연락해요!" },
-  { text: "내 질문을 자르듯, 그 사람은 벌써 문 쪽으로 걸어가며 손을 흔들었다. 그러곤 나가버렸다." },
-  { sprite: null, text: "문이 닫히고, 병실엔 나 혼자 남았다." },
-  { text: "나는 손바닥을 내려다봤다." },
-  { bg: "palm", text: "삐뚤빼뚤한 번호. 이름도 모르는 사람의 연락처가 잉크로 남아 있었다." },
-  { text: "…이름을 안 물어봤네. 아니, 물어봤는데 안 알려준 건가.", thought: true },
-  { text: "그게, 그 사람과의 첫 만남이었다." },
+  asset("emotion_basic", "기본", "기본", "emotion"),
+  asset("emotion_surprised", "놀람", "놀람", "emotion"),
+  asset("emotion_blank", "멍", "멍", "emotion"),
+  asset("emotion_blush", "부끄러움", "부끄러움", "emotion"),
+  asset("emotion_pout", "삐짐", "삐짐", "emotion"),
+  asset("emotion_sad", "슬픔", "슬픔", "emotion"),
+  asset("emotion_awkward", "애매", "애매", "emotion"),
+  asset("emotion_wronged", "억울함", "억울함", "emotion"),
+  asset("emotion_smile", "웃음", "웃음", "emotion"),
+
+  asset("cg_01_bike_charge", "01_bike_charge", "자전거 돌진", "cg"),
+  asset("cg_02_hospital_wake_1", "02_hospital_wake_1", "병실에서 깨어남", "cg"),
+  asset("cg_02_hospital_wake_2", "02_hospital_wake_2", "살아있어!", "cg"),
+  asset("cg_03_pen_focus", "03_palm_number", "펜을 든 니유", "cg"),
+  asset("cg_04_palm_number", "04_palm", "손바닥의 번호", "cg"),
+  asset("cg_05_sofa_sleeping", "05_sofa_sleeping", "소파에서 자는 니유", "cg"),
+  asset("cg_06_sofa_startled", "06_sofa_startled", "벌떡 일어난 니유", "cg"),
+  asset("cg_07_interview_1", "07_interview_1", "면접 중 딴청", "cg"),
+  asset("cg_07_interview_2", "07_interview_2", "니유의 질문", "cg"),
+  asset("cg_08_armup", "08_armup", "팔 동작 시범", "cg"),
+  asset("cg_09_helmet", "09_helmet", "헬멧 선물", "cg"),
+  asset("cg_10_busshoulder", "10_busshoulder", "버스에서", "cg"),
+  asset("cg_11_doghug", "11_doghug", "강아지를 안고", "cg"),
+  asset("cg_12_tease", "12_tease", "겁쟁이", "cg"),
+  asset("cg_13_dance", "13_dance", "니유의 춤", "cg"),
+  asset("cg_14_falldown", "14_falldown", "엉덩방아", "cg"),
+  asset("cg_15_drunken", "15_drunken", "취한 니유", "cg"),
+  asset("cg_16_drunkensleep", "16_drunkensleep", "취중 잠버릇", "cg"),
+  asset("cg_17_charge", "17_charge", "책임지고 연습", "cg"),
+  asset("cg_18_dancepractice", "18_dancepractice", "둘만의 연습", "cg"),
+  asset("cg_19_festivstart", "19_festivstart", "둘이 된 축제", "cg"),
+  asset("cg_20_festivcatch", "20_festivcatch", "붙잡은 소매", "cg"),
+  asset("cg_21_festivcatching", "21_festivcatching", "서로의 소매", "cg"),
+  asset("cg_22_festivgun", "22_festivgun", "사격 부스", "cg"),
+  asset("cg_23_festivphone", "23_festivphone", "내기값 갚는 날", "cg"),
+  asset("cg_24_festivhena", "24_festivhena", "이어지는 헤나", "cg"),
+  asset("cg_25_festivdart", "25_festivdart", "풍선 다트", "cg"),
+  asset("cg_26_festivpic", "26_festivpic", "네 번째 사진", "cg"),
 ];
 
+const byId = Object.fromEntries(images.map((item) => [item.id, item]));
+const idByFilename = Object.fromEntries(images.map((item) => [`${item.file}.png`, item.id]));
+Object.assign(idByFilename, {
+  "02_hospital_wake.png": "cg_02_hospital_wake_1",
+  "03_pen_focus.png": "cg_03_pen_focus",
+  "04_palm_number.png": "cg_04_palm_number",
+  "24_festivehena.png": "cg_24_festivhena",
+});
+const galleryImages = images.filter((item) => item.kind === "cg");
+const galleryImageIds = new Set(galleryImages.map((item) => item.id));
+const UNLOCK_STORAGE_KEY = "neeyu.gallery-unlocked.v3";
+
+const chapterInfo = {
+  "프롤로그 — 첫 만남(?)": { index: 0, eyebrow: "PROLOGUE", title: "첫 만남(?)", bg: "bg_road" },
+  "1장 — 면접": { index: 1, eyebrow: "CHAPTER 01", title: "면접", bg: "bg_school" },
+  "2장 — 환영회": { index: 2, eyebrow: "CHAPTER 02", title: "환영회", bg: "bg_clubroom" },
+  "3장 — 연습": { index: 3, eyebrow: "CHAPTER 03", title: "연습", bg: "bg_clubroom" },
+  "4장 — 축제": { index: 4, eyebrow: "CHAPTER 04", title: "축제", bg: "bg_festival" },
+};
+
+const sceneCues = [
+  { match: "살아있어! 다행이다", bg: "cg_02_hospital_wake_2", sprite: null },
+  { match: "그러니까, 정리하면요.", bg: "bg_hospital", sprite: "emotion_basic" },
+  { match: "제가 언덕에서 브레이크가 고장 났고", sprite: "emotion_awkward" },
+  { match: "—그래서 제가 책임질게요.", sprite: "emotion_basic" },
+  { match: "몰라요.", sprite: "emotion_blank" },
+  { match: "근데 책임진다는 말은", sprite: "emotion_smile" },
+  { match: "내 질문을 자르듯", bg: "bg_hospital", sprite: "emotion_smile" },
+  { match: "문이 닫히고, 병실엔 나 혼자 남았다.", sprite: null },
+
+  { match: "동아리실은 생각보다 조용했다.", bg: "bg_clubroom", sprite: null },
+  { match: "어! 그때 그—", bg: "bg_clubroom", sprite: "emotion_surprised" },
+  { match: "…누구시더라?", sprite: "emotion_blank" },
+  { match: "…아! 자전거!", sprite: "emotion_surprised" },
+  { match: "…어. 이거 좀 곤란한데.", sprite: "emotion_awkward" },
+  { match: "그 사람은 잠깐 나를 빤히 보더니 씩 웃었다.", sprite: "emotion_smile" },
+  { match: "오. 저는 비둘기요.", sprite: "emotion_smile" },
+  { match: "부장. 얘 붙여요.", sprite: "emotion_smile" },
+  { match: "강아지 좋아한대요. 됐어요.", sprite: "emotion_smile" },
+  { match: "…내 팔을 봤잖아.", sprite: "emotion_basic" },
+
+  { match: "그리고 그 주 금요일, 부장이 공지를 띄웠다.", bg: "bg_clubroom", sprite: "emotion_basic" },
+  { match: "야, 신입. 물 좀.", bg: "bg_clubroom", sprite: "emotion_basic" },
+  { match: "…너 요즘 왜 그래?", sprite: "emotion_awkward" },
+  { match: "내가 책임지고 무대 세울게.", sprite: "emotion_basic" },
+  { match: "연습은 지옥이었다.", bg: "bg_clubroom", sprite: "emotion_basic" },
+  { match: "연습이 거듭될수록, 이상한 게 하나둘 늘었다.", bg: "bg_clubroom", sprite: "emotion_basic" },
+  { match: "그거야! 방금 그거! 한 번 더!", sprite: "emotion_smile" },
+  { match: "…너 그 말 어디서 배웠어?", sprite: "emotion_surprised" },
+  { match: "흐음. 역시.", sprite: "emotion_smile" },
+  { match: "그것도 한 12퍼센트쯤.", sprite: "emotion_awkward" },
+  { match: "봤지? 늘었잖아.", sprite: "emotion_smile" },
+  { match: "싫어. 성장 서사가 한눈에 보이는데.", sprite: "emotion_pout" },
+
+  { match: "축제에서 니유 선배와 다니는 건", bg: "bg_festival", sprite: "emotion_basic" },
+  { match: "오. 너 지금 나 잡았다?", sprite: "emotion_smile" },
+  { match: "잘했어. 나 잘 잃어버려.", sprite: "emotion_smile" },
+  { match: "사격 부스에서 사달이 났다.", bg: "bg_festivalbooth", sprite: "emotion_basic" },
+  { match: "이거 무효야. 바람 불었어.", sprite: "emotion_wronged" },
+  { match: "…총이 휘었어.", sprite: "emotion_pout" },
+  { match: "니유는 내기에 진지한 사람이야.", sprite: "emotion_basic" },
+  { match: "다음은 헤나 부스였다.", bg: "bg_festivalbooth", sprite: "emotion_basic" },
+  { match: "그거 완전 퍼즐이네.", sprite: "emotion_smile" },
+  { match: "오오. 진짜 이어진다. 신기해.", sprite: "emotion_smile" },
+  { match: "중앙 광장에서는 학생회가", bg: "bg_festival", sprite: "emotion_basic" },
+  { match: "봤어? 이제 음악이 널 끌고 가는 게 아니라", sprite: "emotion_smile" },
+  { match: "사달은 다트 부스에서 났다.", bg: "bg_festivalbooth", sprite: "emotion_basic" },
+  { match: "저 부스 재미없겠더라.", sprite: "emotion_awkward" },
+  { match: "…괜찮아?", sprite: "emotion_sad" },
+  { match: "해가 지기 전, 마지막으로 인생네컷을 찍었다.", bg: "bg_festivalbooth", sprite: "emotion_basic" },
+  { match: "아. 망했다.", sprite: "emotion_awkward" },
+];
+
+const effectCues = [
+  { match: "끼이이이익", sound: "squeak", effect: "shake" },
+  { match: "시야가 하얗다.", effect: "blink" },
+  { match: "빵—!", sound: "bang", effect: "black" },
+  { match: "빵!", sound: "bang", effect: "black" },
+];
+
+function parseStory(markdown) {
+  const steps = [];
+  const lines = markdown.replace(/\r/g, "").split("\n");
+  let paragraph = [];
+  let pendingVisual;
+  let pendingChapter;
+  let currentChapter = chapterInfo["프롤로그 — 첫 만남(?)"];
+  let baseBackground = currentChapter.bg;
+  let visibleBackground = "";
+
+  const decorate = (step) => {
+    if (pendingChapter) {
+      step.chapter = pendingChapter;
+      step.bg = pendingChapter.bg;
+      step.sprite = null;
+      baseBackground = pendingChapter.bg;
+      visibleBackground = pendingChapter.bg;
+      pendingChapter = null;
+    }
+    if (pendingVisual) {
+      step.bg = pendingVisual;
+      step.sprite = null;
+      visibleBackground = pendingVisual;
+      pendingVisual = undefined;
+    }
+    const cue = sceneCues.find((item) => step.text?.includes(item.match));
+    if (cue) {
+      const cueValues = Object.fromEntries(Object.entries(cue).filter(([key]) => key !== "match"));
+      Object.assign(step, cueValues);
+      if (cue.bg) {
+        visibleBackground = cue.bg;
+        if (!cue.bg.startsWith("cg_")) baseBackground = cue.bg;
+      } else if (cue.sprite && visibleBackground.startsWith("cg_")) {
+        step.bg = baseBackground;
+        visibleBackground = baseBackground;
+      }
+    }
+    const effect = effectCues.find((item) => step.text?.includes(item.match));
+    if (effect) Object.assign(step, Object.fromEntries(Object.entries(effect).filter(([key]) => key !== "match")));
+    steps.push(step);
+  };
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    let text = paragraph.join(" ").trim();
+    paragraph = [];
+    const thought = /^\*[^*].*\*$/.test(text);
+    if (thought) text = text.slice(1, -1).trim();
+    if (text) decorate({ text, thought });
+  };
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (!line || line === "---") {
+      flushParagraph();
+      continue;
+    }
+
+    const heading = line.match(/^##\s+(.+)$/);
+    if (heading) {
+      flushParagraph();
+      currentChapter = chapterInfo[heading[1]] || currentChapter;
+      pendingChapter = currentChapter;
+      continue;
+    }
+
+    const imageMatch = line.match(/^!\[[^\]]*\]\((?:images\/)?([^\)]+)\)$/);
+    if (imageMatch) {
+      flushParagraph();
+      pendingVisual = idByFilename[imageMatch[1]];
+      continue;
+    }
+
+    if (/^>\s*\*\*선택지/.test(line)) {
+      flushParagraph();
+      const prompt = line.replace(/^>\s*\*\*/, "").replace(/\*\*$/, "").trim();
+      const options = [];
+      let cursor = index + 1;
+      while (cursor < lines.length) {
+        const candidate = lines[cursor].trim();
+        if (!candidate) {
+          cursor += 1;
+          continue;
+        }
+        if (!candidate.startsWith(">")) break;
+        const optionMatch = candidate.match(/^>\s*[A-Z]\.\s*(?:「(.+?)」|(.+?))\s*→\s*(.+)$/);
+        if (optionMatch) options.push({ label: (optionMatch[1] || optionMatch[2]).trim(), result: optionMatch[3].trim() });
+        cursor += 1;
+      }
+      index = cursor - 1;
+      decorate({ type: "choice", text: prompt.replace(/^선택지\s*\d*\s*[—-]?\s*/, ""), options });
+      continue;
+    }
+
+    const dialogue = line.match(/^>\s*([^:]+):\s*"([\s\S]+)"$/);
+    if (dialogue) {
+      flushParagraph();
+      decorate({ speaker: dialogue[1].trim(), text: dialogue[2].trim() });
+      continue;
+    }
+
+    if (line.startsWith(">")) continue;
+    paragraph.push(line);
+  }
+
+  flushParagraph();
+  return steps;
+}
+
+const story = parseStory(STORY_MARKDOWN);
+
 const $ = (selector) => document.querySelector(selector);
-const loadingScreen = $("#loading-screen");
 const titleScreen = $("#title-screen");
 const gameScreen = $("#game-screen");
 const sceneBg = $("#scene-bg");
-const sceneSprite = $("#scene-sprite");
+const spriteLayers = [$("#scene-sprite-a"), $("#scene-sprite-b")];
 const sceneStage = $("#scene-stage");
 const sceneCurtain = $("#scene-curtain");
 const dialogueText = $("#dialogue-text");
 const speakerName = $("#speaker-name");
 const dialogueBox = $("#dialogue-box");
+const choicePanel = $("#choice-panel");
+const choiceTitle = $("#choice-title");
+const choiceButtons = $("#choice-buttons");
 const endCard = $("#end-card");
 const nameDialog = $("#name-dialog");
 const galleryDialog = $("#gallery-dialog");
@@ -97,19 +273,25 @@ try {
 } catch {
   localStorage.removeItem(UNLOCK_STORAGE_KEY);
 }
+
 let unlocked = new Set(savedUnlocks.filter((id) => galleryImageIds.has(id)));
+let runtimeStory = [];
 let storyIndex = 0;
 let currentBg = "";
 let currentSprite = "";
+let visibleSpriteLayer = 0;
+let spriteTransitionToken = 0;
 let typingTimer = null;
 let isTyping = false;
 let fullText = "";
+let awaitingChoice = false;
+let activeChapter = chapterInfo["프롤로그 — 첫 만남(?)"];
 
 function setScreen(screen) {
   document.querySelectorAll(".screen").forEach((item) => item.classList.toggle("is-active", item === screen));
 }
 
-function preloadImage(item, timeout = 8000) {
+function preloadImage(item, timeout = 10000) {
   return new Promise((resolve) => {
     const image = new Image();
     let settled = false;
@@ -128,19 +310,21 @@ function preloadImage(item, timeout = 8000) {
 async function preloadAssets() {
   let completed = 0;
   let failed = 0;
-  const total = images.length;
-  const tasks = images.map(async (item) => {
-    const result = await preloadImage(item);
-    completed += 1;
-    if (!result.ok) failed += 1;
-    const percent = Math.round((completed / total) * 100);
-    $("#loading-bar").style.width = `${percent}%`;
-    $("#loading-percent").textContent = `${percent}%`;
-    $("#loading-status").textContent = `장면 이미지 ${completed} / ${total}`;
-    return result;
-  });
-
-  await Promise.all(tasks);
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < images.length) {
+      const item = images[cursor];
+      cursor += 1;
+      const result = await preloadImage(item);
+      completed += 1;
+      if (!result.ok) failed += 1;
+      const percent = Math.round((completed / images.length) * 100);
+      $("#loading-bar").style.width = `${percent}%`;
+      $("#loading-percent").textContent = `${percent}%`;
+      $("#loading-status").textContent = `장면 이미지 ${completed} / ${images.length}`;
+    }
+  };
+  await Promise.all(Array.from({ length: 4 }, worker));
   $("#loading-status").textContent = failed ? `준비 완료 · 불러오지 못한 이미지 ${failed}개` : "준비 완료";
   await new Promise((resolve) => window.setTimeout(resolve, failed ? 900 : 450));
   setScreen(titleScreen);
@@ -209,44 +393,77 @@ function beginGame() {
   window.setTimeout(() => input.focus(), 50);
 }
 
+function clearSprites(immediate = false) {
+  spriteTransitionToken += 1;
+  currentSprite = "";
+  spriteLayers.forEach((layer) => {
+    layer.classList.remove("is-visible");
+    if (immediate) layer.removeAttribute("src");
+    else window.setTimeout(() => layer.removeAttribute("src"), 650);
+  });
+}
+
 function startStory() {
+  runtimeStory = story.map((step) => ({ ...step, options: step.options?.map((option) => ({ ...option })) }));
   storyIndex = 0;
   currentBg = "";
-  currentSprite = "";
+  clearSprites(true);
+  awaitingChoice = false;
+  choicePanel.hidden = true;
+  sceneBg.removeAttribute("src");
   endCard.classList.remove("is-visible");
   dialogueBox.hidden = false;
   setScreen(gameScreen);
-  showStep(story[storyIndex]);
+  showStep(runtimeStory[storyIndex]);
 }
 
-function changeImage(element, id, type) {
-  if (type === "bg") {
-    if (!id || id === currentBg) return;
-    currentBg = id;
-    element.style.opacity = "0";
-    window.setTimeout(() => {
-      element.src = byId[id].url;
-      element.style.opacity = "1";
-      unlockImage(id);
-    }, 220);
-    return;
-  }
-
-  if (id === undefined) return;
-  if (!id) {
-    currentSprite = "";
-    element.classList.remove("has-image");
-    window.setTimeout(() => element.removeAttribute("src"), 450);
-    return;
-  }
-  if (id === currentSprite) return;
-  currentSprite = id;
-  element.classList.remove("has-image");
+function changeBackground(id) {
+  if (!id || id === currentBg || !byId[id]) return;
+  currentBg = id;
+  sceneBg.style.opacity = "0";
   window.setTimeout(() => {
-    element.src = byId[id].url;
-    element.classList.add("has-image");
+    sceneBg.src = byId[id].url;
     unlockImage(id);
-  }, 180);
+  }, 220);
+}
+
+function changeSprite(id) {
+  if (id === undefined || id === currentSprite) return;
+  if (!id) {
+    clearSprites(false);
+    return;
+  }
+  if (!byId[id]) return;
+
+  currentSprite = id;
+  const token = ++spriteTransitionToken;
+  const oldLayer = spriteLayers[visibleSpriteLayer];
+  const incomingIndex = visibleSpriteLayer === 0 ? 1 : 0;
+  const incomingLayer = spriteLayers[incomingIndex];
+  incomingLayer.classList.remove("is-visible");
+  incomingLayer.style.zIndex = "3";
+  oldLayer.style.zIndex = "2";
+  let revealed = false;
+
+  const reveal = () => {
+    if (revealed || token !== spriteTransitionToken) return;
+    revealed = true;
+    requestAnimationFrame(() => incomingLayer.classList.add("is-visible"));
+    window.setTimeout(() => {
+      if (token !== spriteTransitionToken) return;
+      oldLayer.classList.remove("is-visible");
+      oldLayer.removeAttribute("src");
+      visibleSpriteLayer = incomingIndex;
+    }, 650);
+  };
+
+  incomingLayer.onload = reveal;
+  incomingLayer.onerror = () => incomingLayer.classList.remove("is-visible");
+  incomingLayer.src = byId[id].url;
+  if (incomingLayer.complete) {
+    if (incomingLayer.decode) incomingLayer.decode().then(reveal).catch(reveal);
+    else reveal();
+  }
 }
 
 function playSound(id) {
@@ -263,7 +480,7 @@ function playEffect(effect) {
     void sceneCurtain.offsetWidth;
     sceneCurtain.classList.add("flash-black");
   }
-  if (effect === "turn" || effect === "shake") {
+  if (effect === "shake") {
     sceneStage.classList.remove("turn-effect");
     void sceneStage.offsetWidth;
     sceneStage.classList.add("turn-effect");
@@ -291,21 +508,67 @@ function typeText(text) {
   }, 24);
 }
 
+function updateChapter(chapter) {
+  if (!chapter) return;
+  activeChapter = chapter;
+  $("#chapter-eyebrow").textContent = chapter.eyebrow;
+  $("#chapter-title").textContent = chapter.title;
+}
+
+function resolveSpeaker(step) {
+  if (!step.speaker || step.speaker === "U") return nickname;
+  if (step.speaker === "N") return activeChapter.index === 0 ? "???" : "니유 선배";
+  return step.speaker;
+}
+
+function showChoice(step) {
+  awaitingChoice = true;
+  choiceTitle.textContent = step.text;
+  choiceButtons.replaceChildren();
+  step.options.forEach((option, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.innerHTML = `<span>${String(index + 1).padStart(2, "0")}</span>${option.label}`;
+    button.addEventListener("click", () => selectChoice(option));
+    choiceButtons.append(button);
+  });
+  choicePanel.hidden = false;
+}
+
+function selectChoice(option) {
+  awaitingChoice = false;
+  choicePanel.hidden = true;
+  const resultSprite = option.result.includes("도망") ? "emotion_blush" : option.result.includes("천천히") ? "emotion_smile" : "emotion_basic";
+  const resultScene = activeChapter.index === 4 ? { bg: "bg_festival", sprite: resultSprite } : {};
+  runtimeStory.splice(
+    storyIndex + 1,
+    0,
+    { speaker: "U", text: option.label },
+    { text: option.result, ...resultScene },
+  );
+  storyIndex += 1;
+  showStep(runtimeStory[storyIndex]);
+}
+
 function showStep(step) {
-  changeImage(sceneBg, step.bg, "bg");
-  changeImage(sceneSprite, step.sprite, "sprite");
+  updateChapter(step.chapter);
+  changeBackground(step.bg);
+  changeSprite(step.sprite);
   if (typeof step.blur === "boolean") sceneBg.classList.toggle("is-blurred", step.blur);
-  const isGirl = step.speaker === "girl";
-  speakerName.textContent = isGirl ? "???" : nickname;
-  speakerName.classList.toggle("is-girl", isGirl);
+
+  const isNeeyu = step.speaker === "N";
+  speakerName.textContent = step.type === "choice" ? "선택" : resolveSpeaker(step);
+  speakerName.classList.toggle("is-girl", isNeeyu);
+  speakerName.classList.toggle("is-other", Boolean(step.speaker && !["N", "U"].includes(step.speaker)));
   dialogueText.classList.toggle("is-thought", Boolean(step.thought));
   typeText(step.text);
   playSound(step.sound);
   playEffect(step.effect);
+  if (step.type === "choice") showChoice(step);
 }
 
 function advanceStory() {
-  if (!gameScreen.classList.contains("is-active") || endCard.classList.contains("is-visible")) return;
+  if (!gameScreen.classList.contains("is-active") || endCard.classList.contains("is-visible") || awaitingChoice) return;
   if (isTyping) {
     window.clearInterval(typingTimer);
     dialogueText.textContent = fullText;
@@ -313,17 +576,20 @@ function advanceStory() {
     return;
   }
   storyIndex += 1;
-  if (storyIndex >= story.length) {
+  if (storyIndex >= runtimeStory.length) {
     dialogueBox.hidden = true;
+    clearSprites(false);
     endCard.classList.add("is-visible");
     return;
   }
-  showStep(story[storyIndex]);
+  showStep(runtimeStory[storyIndex]);
 }
 
 function goHome() {
   window.clearInterval(typingTimer);
   isTyping = false;
+  awaitingChoice = false;
+  choicePanel.hidden = true;
   updateGalleryState();
   setScreen(titleScreen);
 }
@@ -358,6 +624,11 @@ $("#name-form").addEventListener("submit", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (!gameScreen.classList.contains("is-active") || nameDialog.open || galleryDialog.open || imageDialog.open) return;
+  if (awaitingChoice && /^Digit[12]$/.test(event.code)) {
+    const option = runtimeStory[storyIndex].options[Number(event.code.slice(-1)) - 1];
+    if (option) selectChoice(option);
+    return;
+  }
   if (event.code === "Enter" || event.code === "Space") {
     event.preventDefault();
     advanceStory();
@@ -366,7 +637,6 @@ document.addEventListener("keydown", (event) => {
 
 sceneBg.addEventListener("error", () => { sceneBg.style.opacity = "0"; });
 sceneBg.addEventListener("load", () => { sceneBg.style.opacity = "1"; });
-sceneSprite.addEventListener("error", () => sceneSprite.classList.remove("has-image"));
 
 updateGalleryState();
 preloadAssets();
