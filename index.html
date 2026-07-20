@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a1b26" />
     <meta name="description" content="비주얼 노벨 니유 선배?" />
     <title>니유 선배?</title>
-    <link rel="stylesheet" href="styles.css?v=20260716-ch04" />
+    <link rel="stylesheet" href="styles.css?v=20260720-ch07" />
   </head>
   <body>
     <main id="app" class="app-shell">
@@ -46,7 +46,7 @@
             <span class="menu-index" id="gallery-count">00</span>
           </button>
         </nav>
-        <p class="title-version">CHAPTER 04 · v0.4</p>
+        <p class="title-version">CHAPTER 07 · v0.7</p>
       </section>
 
       <section id="game-screen" class="screen game-screen" aria-label="게임 화면">
@@ -67,6 +67,22 @@
 
         <button id="advance-area" class="advance-area" type="button" aria-label="다음 대사"></button>
 
+        <section id="phone-panel" class="phone-panel" aria-label="니유 선배와의 문자 대화" aria-hidden="true">
+          <div class="phone-shell">
+            <div class="phone-status">
+              <time>9:41</time>
+              <span aria-hidden="true">● ◒ ▰</span>
+            </div>
+            <header class="phone-contact">
+              <span class="phone-back" aria-hidden="true">‹</span>
+              <span class="phone-avatar" aria-hidden="true">N</span>
+              <span><b>니유 선배</b><small>온라인</small></span>
+            </header>
+            <div id="phone-messages" class="phone-messages" aria-live="polite"></div>
+            <div class="phone-composer" aria-hidden="true"><span>메시지</span><b>↑</b></div>
+          </div>
+        </section>
+
         <div id="dialogue-box" class="dialogue-box">
           <div id="speaker-name" class="speaker-name">나</div>
           <p id="dialogue-text" class="dialogue-text"></p>
@@ -79,9 +95,19 @@
           <div id="choice-buttons" class="choice-buttons"></div>
         </section>
 
-        <section id="end-card" class="end-card" aria-label="4장 완료">
-          <p>CHAPTER 04 COMPLETE</p>
-          <h2>우리 둘 다, 넷째 컷이<br />남는 쪽으로 잘랐다.</h2>
+        <section id="answer-panel" class="answer-panel" aria-label="마지막 답변" hidden>
+          <form id="answer-form">
+            <label for="story-answer">당신의 답변</label>
+            <div>
+              <input id="story-answer" type="text" maxlength="80" autocomplete="off" placeholder="니유 선배에게 답해주세요" required />
+              <button type="submit">전하기</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="end-card" class="end-card" aria-label="7장 완료">
+          <p>CHAPTER 07 COMPLETE</p>
+          <h2>미안해서가 아니라,<br />그냥 옆에 있고 싶어서.</h2>
           <div class="end-actions">
             <button id="end-gallery-button" type="button">해금 이미지 보기</button>
             <button id="end-home-button" type="button">메인 화면</button>
@@ -127,7 +153,7 @@
 
     <audio id="sfx-squeak" preload="auto" src="data/sound/01_squeak.mp3"></audio>
     <audio id="sfx-bang" preload="auto" src="data/sound/02_bang.mp3"></audio>
-    <script src="story-data.js?v=20260716-ch04"></script>
-    <script src="game.js?v=20260716-ch04"></script>
+    <script src="story-data.js?v=20260720-ch07"></script>
+    <script src="game.js?v=20260720-ch07"></script>
   </body>
 </html>
