@@ -106,6 +106,9 @@ const chapterInfo = {
 };
 
 const sceneCues = [
+  { match: "...그 다음은, 기억이 없다.", chapterIndex: 0, curtain: "hold" },
+  { match: "시야가 하얗다.", chapterIndex: 0, bg: "cg_02_hospital_wake_1", blur: true, curtain: "reveal" },
+  { match: "천천히, 세상이 형태를 되찾는다.", chapterIndex: 0, blur: false },
   { match: "살아있어! 다행이다", bg: "cg_02_hospital_wake_2", sprite: null },
   { match: "그러니까, 정리하면요.", bg: "bg_hospital", sprite: "emotion_basic" },
   { match: "제가 언덕에서 브레이크가 고장 났고", sprite: "emotion_awkward" },
@@ -116,6 +119,7 @@ const sceneCues = [
   { match: "문이 닫히고, 병실엔 나 혼자 남았다.", sprite: null },
 
   { match: "동아리실은 생각보다 조용했다.", bg: "bg_clubroom", sprite: null },
+  { match: "안 잤어요!", bg: "cg_06_sofa_startled", sprite: null },
   { match: "어! 그때 그—", bg: "bg_clubroom", sprite: "emotion_surprised" },
   { match: "…누구시더라?", sprite: "emotion_blank" },
   { match: "…아! 자전거!", sprite: "emotion_surprised" },
@@ -230,9 +234,9 @@ function parseStory(markdown) {
       visibleBackground = pendingVisual;
       pendingVisual = undefined;
     }
-    const cue = sceneCues.find((item) => step.text?.includes(item.match));
+    const cue = sceneCues.find((item) => step.text?.includes(item.match) && (item.chapterIndex === undefined || item.chapterIndex === currentChapter.index));
     if (cue) {
-      const cueValues = Object.fromEntries(Object.entries(cue).filter(([key]) => key !== "match"));
+      const cueValues = Object.fromEntries(Object.entries(cue).filter(([key]) => !["match", "chapterIndex"].includes(key)));
       Object.assign(step, cueValues);
       if (cue.bg) {
         visibleBackground = cue.bg;
@@ -346,7 +350,7 @@ async function loadStory() {
 const $ = (selector) => document.querySelector(selector);
 const titleScreen = $("#title-screen");
 const gameScreen = $("#game-screen");
-const sceneBg = $("#scene-bg");
+const backgroundLayers = [$("#scene-bg-a"), $("#scene-bg-b")];
 const spriteLayers = [$("#scene-sprite-a"), $("#scene-sprite-b")];
 const sceneStage = $("#scene-stage");
 const sceneCurtain = $("#scene-curtain");
@@ -364,6 +368,7 @@ const endCard = $("#end-card");
 const nameDialog = $("#name-dialog");
 const galleryDialog = $("#gallery-dialog");
 const imageDialog = $("#image-dialog");
+const previousButton = $("#previous-button");
 
 let nickname = localStorage.getItem("neeyu.nickname") || "";
 let savedUnlocks = [];
@@ -377,6 +382,8 @@ let unlocked = new Set(savedUnlocks.filter((id) => galleryImageIds.has(id)));
 let runtimeStory = [];
 let storyIndex = 0;
 let currentBg = "";
+let visibleBackgroundLayer = 0;
+let backgroundTransitionToken = 0;
 let currentSprite = "";
 let visibleSpriteLayer = 0;
 let spriteTransitionToken = 0;
@@ -387,6 +394,10 @@ let awaitingChoice = false;
 let awaitingAnswer = false;
 let phoneIsOpen = false;
 let activeChapter = chapterInfo["프롤로그 — 첫 만남(?)"];
+let activeAudio = null;
+let audioFadeTimer = null;
+let audioTransitionToken = 0;
+let stepRenderToken = 0;
 
 function setScreen(screen) {
   document.querySelectorAll(".screen").forEach((item) => item.classList.toggle("is-active", item === screen));
@@ -499,7 +510,7 @@ function setPhoneOpen(open, reset = false) {
   if (reset) phoneMessages.replaceChildren();
 }
 
-function addPhoneMessage(step) {
+function addPhoneMessage(step, animate = true) {
   if (!phoneIsOpen) setPhoneOpen(true, true);
   const outgoing = step.speaker === "U";
   const group = document.createElement("div");
@@ -516,8 +527,9 @@ function addPhoneMessage(step) {
   }
 
   phoneMessages.append(group);
-  requestAnimationFrame(() => group.classList.add("is-visible"));
-  phoneMessages.scrollTo({ top: phoneMessages.scrollHeight, behavior: "smooth" });
+  if (animate) requestAnimationFrame(() => group.classList.add("is-visible"));
+  else group.classList.add("is-visible");
+  phoneMessages.scrollTo({ top: phoneMessages.scrollHeight, behavior: animate ? "smooth" : "auto" });
 }
 
 function clearSprites(immediate = false) {
@@ -530,18 +542,39 @@ function clearSprites(immediate = false) {
   });
 }
 
+function clearBackgrounds(immediate = false) {
+  backgroundTransitionToken += 1;
+  currentBg = "";
+  visibleBackgroundLayer = 0;
+  backgroundLayers.forEach((layer) => {
+    layer.classList.remove("is-visible", "is-blurred");
+    if (immediate) layer.removeAttribute("src");
+    else window.setTimeout(() => layer.removeAttribute("src"), 850);
+  });
+}
+
+function setBackgroundBlur(blur) {
+  backgroundLayers.forEach((layer) => layer.classList.toggle("is-blurred", blur));
+}
+
+function setCurtainMode(mode) {
+  sceneCurtain.classList.remove("flash-black", "fade-to-black");
+  sceneCurtain.classList.toggle("hold-black", mode === "hold");
+}
+
 function startStory() {
   runtimeStory = story.map((step) => ({ ...step, options: step.options?.map((option) => ({ ...option })) }));
   storyIndex = 0;
-  currentBg = "";
+  clearBackgrounds(true);
   clearSprites(true);
   awaitingChoice = false;
   awaitingAnswer = false;
   choicePanel.hidden = true;
   answerPanel.hidden = true;
   setPhoneOpen(false, true);
-  sceneCurtain.classList.remove("fade-to-black");
-  sceneBg.removeAttribute("src");
+  setCurtainMode("none");
+  sceneStage.classList.remove("turn-effect", "blink-effect");
+  stopActiveSound(true);
   endCard.classList.remove("is-visible");
   dialogueBox.hidden = false;
   setScreen(gameScreen);
@@ -549,13 +582,50 @@ function startStory() {
 }
 
 function changeBackground(id) {
-  if (!id || id === currentBg || !byId[id]) return;
+  if (!id || !byId[id]) return Promise.resolve(false);
+  if (id === currentBg) return Promise.resolve(true);
+
   currentBg = id;
-  sceneBg.style.opacity = "0";
-  window.setTimeout(() => {
-    sceneBg.src = byId[id].url;
-    unlockImage(id);
-  }, 220);
+  const token = ++backgroundTransitionToken;
+  const oldLayer = backgroundLayers[visibleBackgroundLayer];
+  const incomingIndex = visibleBackgroundLayer === 0 ? 1 : 0;
+  const incomingLayer = backgroundLayers[incomingIndex];
+  incomingLayer.classList.remove("is-visible");
+  incomingLayer.style.zIndex = "2";
+  oldLayer.style.zIndex = "1";
+
+  return new Promise((resolve) => {
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      if (token !== backgroundTransitionToken) {
+        resolve(false);
+        return;
+      }
+
+      unlockImage(id);
+      requestAnimationFrame(() => incomingLayer.classList.add("is-visible"));
+      window.setTimeout(() => {
+        if (token !== backgroundTransitionToken) return;
+        oldLayer.classList.remove("is-visible");
+        oldLayer.removeAttribute("src");
+        visibleBackgroundLayer = incomingIndex;
+      }, 850);
+      resolve(true);
+    };
+
+    incomingLayer.onload = reveal;
+    incomingLayer.onerror = () => {
+      incomingLayer.classList.remove("is-visible");
+      resolve(false);
+    };
+    incomingLayer.src = byId[id].url;
+    if (incomingLayer.complete) {
+      if (incomingLayer.decode) incomingLayer.decode().then(reveal).catch(reveal);
+      else reveal();
+    }
+  });
 }
 
 function changeSprite(id) {
@@ -597,11 +667,54 @@ function changeSprite(id) {
   }
 }
 
+function stopActiveSound(immediate = false, duration = 180) {
+  window.clearInterval(audioFadeTimer);
+  audioFadeTimer = null;
+  const audio = activeAudio;
+  if (!audio) return;
+  const token = ++audioTransitionToken;
+
+  const finish = () => {
+    if (token !== audioTransitionToken) return;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 1;
+    if (activeAudio === audio) activeAudio = null;
+  };
+
+  if (immediate || audio.paused) {
+    finish();
+    return;
+  }
+
+  const startVolume = audio.volume;
+  const startedAt = Date.now();
+  audioFadeTimer = window.setInterval(() => {
+    if (token !== audioTransitionToken) {
+      window.clearInterval(audioFadeTimer);
+      return;
+    }
+    const progress = Math.min(1, (Date.now() - startedAt) / duration);
+    audio.volume = startVolume * (1 - progress);
+    if (progress >= 1) {
+      window.clearInterval(audioFadeTimer);
+      audioFadeTimer = null;
+      finish();
+    }
+  }, 20);
+}
+
 function playSound(id) {
   const audio = $(`#sfx-${id}`);
   if (!audio) return;
+  stopActiveSound(true);
+  audioTransitionToken += 1;
+  activeAudio = audio;
+  audio.volume = 1;
   audio.currentTime = 0;
-  audio.play().catch(() => {});
+  audio.play().catch(() => {
+    if (activeAudio === audio) activeAudio = null;
+  });
 }
 
 function playEffect(effect) {
@@ -669,8 +782,12 @@ function showChoice(step) {
 function selectChoice(option) {
   awaitingChoice = false;
   choicePanel.hidden = true;
+  const choiceStep = runtimeStory[storyIndex];
+  if (choiceStep.choiceResultCount) runtimeStory.splice(storyIndex + 1, choiceStep.choiceResultCount);
   const resultSprite = option.result.includes("도망") ? "emotion_blush" : option.result.includes("천천히") ? "emotion_smile" : "emotion_basic";
   const resultScene = activeChapter.index === 4 ? { bg: "bg_festival", sprite: resultSprite } : {};
+  choiceStep.choiceResultCount = 2;
+  choiceStep.selectedOption = option.label;
   runtimeStory.splice(
     storyIndex + 1,
     0,
@@ -701,13 +818,82 @@ function finishChapterSeven(answer) {
   }, 900);
 }
 
-function showStep(step) {
-  updateChapter(step.chapter);
-  changeBackground(step.bg);
-  changeSprite(step.sprite);
-  if (typeof step.blur === "boolean") sceneBg.classList.toggle("is-blurred", step.blur);
-  if (step.phoneAction === "open") setPhoneOpen(true, true);
-  if (step.phoneAction === "close") setPhoneOpen(false);
+function getStoryStateAt(index) {
+  const initialChapter = chapterInfo["프롤로그 — 첫 만남(?)"];
+  const state = {
+    chapter: initialChapter,
+    bg: initialChapter.bg,
+    sprite: null,
+    blur: false,
+    curtain: "none",
+    phoneOpen: false,
+    phoneMessages: [],
+  };
+
+  for (let cursor = 0; cursor <= index; cursor += 1) {
+    const step = runtimeStory[cursor];
+    if (step.chapter) state.chapter = step.chapter;
+    if (step.bg) state.bg = step.bg;
+    if (step.sprite !== undefined) state.sprite = step.sprite;
+    if (typeof step.blur === "boolean") state.blur = step.blur;
+    if (step.curtain === "hold") state.curtain = "hold";
+    if (step.curtain === "reveal") state.curtain = "none";
+    if (step.phoneAction === "open") {
+      state.phoneOpen = true;
+      state.phoneMessages = [];
+    }
+    if (step.type === "phone" && state.phoneOpen) state.phoneMessages.push(step);
+    if (step.phoneAction === "close") state.phoneOpen = false;
+  }
+
+  return state;
+}
+
+function restoreStoryState(index) {
+  const state = getStoryStateAt(index);
+  updateChapter(state.chapter);
+  const backgroundReady = changeBackground(state.bg);
+  changeSprite(state.sprite);
+  setBackgroundBlur(state.blur);
+  setCurtainMode(runtimeStory[index]?.curtain === "reveal" ? "hold" : state.curtain);
+  setPhoneOpen(state.phoneOpen, true);
+  state.phoneMessages.forEach((message) => addPhoneMessage(message, false));
+  return backgroundReady;
+}
+
+function updatePreviousButton() {
+  previousButton.disabled = storyIndex <= 0;
+}
+
+function previousStory() {
+  if (!gameScreen.classList.contains("is-active") || storyIndex <= 0) return;
+  window.clearInterval(typingTimer);
+  isTyping = false;
+  awaitingChoice = false;
+  awaitingAnswer = false;
+  choicePanel.hidden = true;
+  answerPanel.hidden = true;
+  endCard.classList.remove("is-visible");
+  dialogueBox.hidden = false;
+  stopActiveSound(true);
+  storyIndex -= 1;
+  const backgroundReady = restoreStoryState(storyIndex);
+  showStep(runtimeStory[storyIndex], { stateRestored: true, backgroundReady });
+  updatePreviousButton();
+}
+
+function showStep(step, options = {}) {
+  const renderToken = ++stepRenderToken;
+  let backgroundReady = options.backgroundReady || Promise.resolve(true);
+  if (!options.stateRestored) {
+    updateChapter(step.chapter);
+    backgroundReady = changeBackground(step.bg);
+    changeSprite(step.sprite);
+    if (typeof step.blur === "boolean") setBackgroundBlur(step.blur);
+    if (step.curtain === "hold") setCurtainMode("hold");
+    if (step.phoneAction === "open") setPhoneOpen(true, true);
+    if (step.phoneAction === "close") setPhoneOpen(false);
+  }
 
   const isNeeyu = step.speaker === "N";
   speakerName.textContent = step.type === "choice" ? "선택" : resolveSpeaker(step);
@@ -720,16 +906,26 @@ function showStep(step) {
     isTyping = false;
     fullText = "";
     dialogueBox.hidden = true;
-    addPhoneMessage(step);
+    if (!options.stateRestored) addPhoneMessage(step);
   } else {
     dialogueBox.hidden = false;
     typeText(step.text);
   }
 
-  playSound(step.sound);
-  playEffect(step.effect);
+  if (step.sound) playSound(step.sound);
+  else stopActiveSound(false);
+  if (step.curtain === "reveal") {
+    Promise.resolve(backgroundReady).then(() => {
+      if (renderToken !== stepRenderToken) return;
+      setCurtainMode("none");
+      playEffect(step.effect);
+    });
+  } else {
+    playEffect(step.effect);
+  }
   if (step.type === "choice") showChoice(step);
   if (step.type === "answer") showAnswer();
+  updatePreviousButton();
 }
 
 function advanceStory() {
@@ -745,6 +941,7 @@ function advanceStory() {
     dialogueBox.hidden = true;
     clearSprites(false);
     endCard.classList.add("is-visible");
+    updatePreviousButton();
     return;
   }
   showStep(runtimeStory[storyIndex]);
@@ -758,6 +955,8 @@ function goHome() {
   choicePanel.hidden = true;
   answerPanel.hidden = true;
   setPhoneOpen(false, true);
+  stopActiveSound(true);
+  previousButton.disabled = true;
   updateGalleryState();
   setScreen(titleScreen);
 }
@@ -770,6 +969,7 @@ $("#gallery-close").addEventListener("click", () => galleryDialog.close());
 $("#viewer-close").addEventListener("click", () => imageDialog.close());
 $("#name-cancel").addEventListener("click", () => nameDialog.close());
 $("#home-button").addEventListener("click", goHome);
+previousButton.addEventListener("click", previousStory);
 $("#end-home-button").addEventListener("click", goHome);
 $("#advance-area").addEventListener("click", advanceStory);
 $("#next-button").addEventListener("click", advanceStory);
@@ -799,6 +999,11 @@ $("#answer-form").addEventListener("submit", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (!gameScreen.classList.contains("is-active") || nameDialog.open || galleryDialog.open || imageDialog.open) return;
+  if (event.code === "ArrowLeft") {
+    event.preventDefault();
+    previousStory();
+    return;
+  }
   if (awaitingAnswer) return;
   if (awaitingChoice && /^Digit[12]$/.test(event.code)) {
     const option = runtimeStory[storyIndex].options[Number(event.code.slice(-1)) - 1];
@@ -810,9 +1015,6 @@ document.addEventListener("keydown", (event) => {
     advanceStory();
   }
 });
-
-sceneBg.addEventListener("error", () => { sceneBg.style.opacity = "0"; });
-sceneBg.addEventListener("load", () => { sceneBg.style.opacity = "1"; });
 
 updateGalleryState();
 

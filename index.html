@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a1b26" />
     <meta name="description" content="비주얼 노벨 니유 선배?" />
     <title>니유 선배?</title>
-    <link rel="stylesheet" href="styles.css?v=20260720-ch07" />
+    <link rel="stylesheet" href="styles.css?v=20260817-backtrack" />
   </head>
   <body>
     <main id="app" class="app-shell">
@@ -52,7 +52,8 @@
       <section id="game-screen" class="screen game-screen" aria-label="게임 화면">
         <div class="scene-stage" id="scene-stage">
           <div class="scene-fallback" aria-hidden="true"></div>
-          <img id="scene-bg" class="scene-bg" alt="" />
+          <img id="scene-bg-a" class="scene-bg" alt="" />
+          <img id="scene-bg-b" class="scene-bg" alt="" />
           <img id="scene-sprite-a" class="scene-sprite" alt="" />
           <img id="scene-sprite-b" class="scene-sprite" alt="" />
           <div class="scene-vignette" aria-hidden="true"></div>
@@ -60,7 +61,10 @@
         </div>
 
         <header class="game-toolbar">
-          <button id="home-button" class="round-button" type="button" aria-label="메인 화면으로">⌂</button>
+          <div class="toolbar-controls">
+            <button id="home-button" class="round-button" type="button" aria-label="메인 화면으로">⌂</button>
+            <button id="previous-button" class="round-button" type="button" aria-label="이전 대사" disabled>↶</button>
+          </div>
           <div class="chapter-label"><span id="chapter-eyebrow">PROLOGUE</span><b id="chapter-title">첫 만남(?)</b></div>
           <button id="game-gallery-button" class="text-button" type="button">IMAGE <span id="game-gallery-count">00</span></button>
         </header>
@@ -153,7 +157,7 @@
 
     <audio id="sfx-squeak" preload="auto" src="data/sound/01_squeak.mp3"></audio>
     <audio id="sfx-bang" preload="auto" src="data/sound/02_bang.mp3"></audio>
-    <script src="story-data.js?v=20260720-ch07"></script>
-    <script src="game.js?v=20260720-ch07"></script>
+    <script src="story-data.js?v=20260817-backtrack"></script>
+    <script src="game.js?v=20260817-backtrack"></script>
   </body>
 </html>

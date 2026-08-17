@@ -360,9 +360,17 @@ input:focus-visible {
 }
 
 .scene-bg {
+  z-index: 1;
   object-fit: cover;
   object-position: center;
+  opacity: 0;
+  backface-visibility: hidden;
+  will-change: opacity, filter;
   transition: opacity 0.8s ease, filter 1s ease, transform 1s ease;
+}
+
+.scene-bg.is-visible {
+  opacity: 1;
 }
 
 .scene-bg.is-blurred {
@@ -379,6 +387,8 @@ input:focus-visible {
   object-fit: contain;
   object-position: center bottom;
   opacity: 0;
+  backface-visibility: hidden;
+  will-change: opacity;
   filter: drop-shadow(0 15px 24px rgba(0, 0, 0, 0.25));
   transform: translateX(50%);
   transition: opacity 0.6s ease;
@@ -404,6 +414,7 @@ input:focus-visible {
 }
 
 .scene-curtain.flash-black { animation: flash-black 1.15s ease; }
+.scene-curtain.hold-black { opacity: 1; transition-duration: 0.12s; }
 .scene-curtain.fade-to-black { z-index: 18; opacity: 1; }
 .scene-stage.turn-effect { animation: turn-effect 0.55s ease; }
 .scene-stage.blink-effect::after {
@@ -448,6 +459,17 @@ input:focus-visible {
 }
 
 .game-toolbar button { pointer-events: auto; }
+
+.toolbar-controls {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.round-button:disabled {
+  cursor: default;
+  opacity: 0.34;
+}
 
 .round-button,
 .text-button {
@@ -503,6 +525,13 @@ input:focus-visible {
   border: 0;
   background: transparent;
   cursor: pointer;
+}
+
+.advance-area:focus,
+.advance-area:focus-visible,
+.next-button:focus,
+.next-button:focus-visible {
+  outline: none;
 }
 
 .dialogue-box {
