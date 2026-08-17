@@ -533,12 +533,17 @@ function addPhoneMessage(step, animate = true) {
 }
 
 function clearSprites(immediate = false) {
-  spriteTransitionToken += 1;
+  const token = ++spriteTransitionToken;
   currentSprite = "";
   spriteLayers.forEach((layer) => {
-    layer.classList.remove("is-visible");
+    layer.classList.remove("is-visible", "is-clearing");
     if (immediate) layer.removeAttribute("src");
-    else window.setTimeout(() => layer.removeAttribute("src"), 650);
+    else {
+      window.setTimeout(() => {
+        if (token !== spriteTransitionToken) return;
+        layer.removeAttribute("src");
+      }, 650);
+    }
   });
 }
 
@@ -641,7 +646,7 @@ function changeSprite(id) {
   const oldLayer = spriteLayers[visibleSpriteLayer];
   const incomingIndex = visibleSpriteLayer === 0 ? 1 : 0;
   const incomingLayer = spriteLayers[incomingIndex];
-  incomingLayer.classList.remove("is-visible");
+  incomingLayer.classList.remove("is-visible", "is-clearing");
   incomingLayer.style.zIndex = "3";
   oldLayer.style.zIndex = "2";
   let revealed = false;
@@ -649,13 +654,21 @@ function changeSprite(id) {
   const reveal = () => {
     if (revealed || token !== spriteTransitionToken) return;
     revealed = true;
-    requestAnimationFrame(() => incomingLayer.classList.add("is-visible"));
-    window.setTimeout(() => {
+    requestAnimationFrame(() => {
       if (token !== spriteTransitionToken) return;
-      oldLayer.classList.remove("is-visible");
-      oldLayer.removeAttribute("src");
-      visibleSpriteLayer = incomingIndex;
-    }, 650);
+      incomingLayer.classList.add("is-visible");
+      window.setTimeout(() => {
+        if (token !== spriteTransitionToken) return;
+        oldLayer.classList.add("is-clearing");
+        oldLayer.classList.remove("is-visible");
+        visibleSpriteLayer = incomingIndex;
+        requestAnimationFrame(() => {
+          if (token !== spriteTransitionToken) return;
+          oldLayer.removeAttribute("src");
+          oldLayer.classList.remove("is-clearing");
+        });
+      }, 650);
+    });
   };
 
   incomingLayer.onload = reveal;

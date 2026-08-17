@@ -398,6 +398,11 @@ input:focus-visible {
   opacity: 1;
 }
 
+.scene-sprite.is-clearing {
+  opacity: 0;
+  transition: none;
+}
+
 .scene-vignette {
   pointer-events: none;
   background:
