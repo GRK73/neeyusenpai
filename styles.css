@@ -389,7 +389,6 @@ input:focus-visible {
   opacity: 0;
   backface-visibility: hidden;
   will-change: opacity;
-  filter: drop-shadow(0 15px 24px rgba(0, 0, 0, 0.25));
   transform: translateX(50%);
   transition: opacity 0.6s ease;
 }
@@ -430,6 +429,104 @@ input:focus-visible {
   pointer-events: none;
   background: #050506;
   animation: blink-effect 1.55s ease forwards;
+}
+
+.episode-card {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  visibility: hidden;
+  overflow: hidden;
+  place-items: center;
+  color: #f8f3ed;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(231, 104, 101, 0.2), transparent 34%),
+    radial-gradient(circle at 76% 24%, rgba(99, 170, 178, 0.18), transparent 30%),
+    #0b0d12;
+  transition: opacity 0.48s ease, visibility 0.48s;
+}
+
+.episode-card::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  opacity: 0.13;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+}
+
+.episode-card::after {
+  position: absolute;
+  width: 58vw;
+  height: 160vh;
+  right: -34vw;
+  content: "";
+  border-left: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.025);
+  transform: rotate(17deg);
+}
+
+.episode-card.is-visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.episode-card-copy {
+  position: relative;
+  z-index: 1;
+  width: min(760px, calc(100vw - 56px));
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.48s ease 0.14s, transform 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
+}
+
+.episode-card.is-visible .episode-card-copy {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.episode-card-kicker {
+  margin: 0 0 18px 4px;
+  color: rgba(248, 243, 237, 0.52);
+  font: 800 10px/1 Arial, sans-serif;
+  letter-spacing: 0.42em;
+}
+
+.episode-card-heading {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(18px, 4vw, 46px);
+}
+
+.episode-card-heading span {
+  flex: 0 0 auto;
+  color: #ec8582;
+  font: 700 clamp(32px, 6vw, 72px)/1 Arial, sans-serif;
+  letter-spacing: -0.05em;
+}
+
+.episode-card-heading h2 {
+  margin: 0;
+  font-family: "KerisKedu", "Dunggeunmiso", sans-serif;
+  font-size: clamp(52px, 10vw, 124px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.episode-card-line {
+  width: 0;
+  height: 1px;
+  margin-top: clamp(24px, 5vw, 48px);
+  background: linear-gradient(90deg, #ec8582, rgba(255, 255, 255, 0.08));
+  transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+}
+
+.episode-card.is-visible .episode-card-line {
+  width: 100%;
 }
 
 @keyframes flash-black {

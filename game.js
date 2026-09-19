@@ -131,6 +131,7 @@ const sceneCues = [
   { match: "…내 팔을 봤잖아.", sprite: "emotion_basic" },
 
   { match: "그리고 그 주 금요일, 부장이 공지를 띄웠다.", bg: "bg_clubroom", sprite: "emotion_basic" },
+  { match: "어제 나 뭐 이상한 짓 안 했지?", bg: "bg_school", sprite: "emotion_awkward" },
   { match: "야, 신입. 물 좀.", bg: "bg_clubroom", sprite: "emotion_basic" },
   { match: "…너 요즘 왜 그래?", sprite: "emotion_awkward" },
   { match: "내가 책임지고 무대 세울게.", sprite: "emotion_basic" },
@@ -354,6 +355,9 @@ const backgroundLayers = [$("#scene-bg-a"), $("#scene-bg-b")];
 const spriteLayers = [$("#scene-sprite-a"), $("#scene-sprite-b")];
 const sceneStage = $("#scene-stage");
 const sceneCurtain = $("#scene-curtain");
+const episodeCard = $("#episode-card");
+const episodeNumber = $("#episode-number");
+const episodeTitle = $("#episode-title");
 const dialogueText = $("#dialogue-text");
 const speakerName = $("#speaker-name");
 const dialogueBox = $("#dialogue-box");
@@ -398,9 +402,53 @@ let activeAudio = null;
 let audioFadeTimer = null;
 let audioTransitionToken = 0;
 let stepRenderToken = 0;
+let episodeTransitionToken = 0;
+let episodeCardTimer = null;
+let episodeCardCleanupTimer = null;
+let episodeCardActive = false;
 
 function setScreen(screen) {
   document.querySelectorAll(".screen").forEach((item) => item.classList.toggle("is-active", item === screen));
+}
+
+function resetEpisodeCard() {
+  episodeTransitionToken += 1;
+  window.clearTimeout(episodeCardTimer);
+  window.clearTimeout(episodeCardCleanupTimer);
+  episodeCardTimer = null;
+  episodeCardCleanupTimer = null;
+  episodeCardActive = false;
+  episodeCard.classList.remove("is-visible");
+  episodeCard.setAttribute("aria-hidden", "true");
+}
+
+function showEpisodeCard(chapter, onReveal) {
+  const token = ++episodeTransitionToken;
+  window.clearTimeout(episodeCardTimer);
+  window.clearTimeout(episodeCardCleanupTimer);
+  episodeCardActive = true;
+  episodeNumber.textContent = `EP${chapter.index}.`;
+  episodeTitle.textContent = chapter.title;
+  episodeCard.classList.remove("is-visible");
+  episodeCard.setAttribute("aria-hidden", "false");
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (token !== episodeTransitionToken) return;
+      episodeCard.classList.add("is-visible");
+    });
+  });
+
+  episodeCardTimer = window.setTimeout(() => {
+    if (token !== episodeTransitionToken) return;
+    episodeCard.classList.remove("is-visible");
+    onReveal();
+    episodeCardCleanupTimer = window.setTimeout(() => {
+      if (token !== episodeTransitionToken) return;
+      episodeCardActive = false;
+      episodeCard.setAttribute("aria-hidden", "true");
+    }, 520);
+  }, 1900);
 }
 
 function preloadImage(item, timeout = 10000) {
@@ -577,6 +625,7 @@ function startStory() {
   choicePanel.hidden = true;
   answerPanel.hidden = true;
   setPhoneOpen(false, true);
+  resetEpisodeCard();
   setCurtainMode("none");
   sceneStage.classList.remove("turn-effect", "blink-effect");
   stopActiveSound(true);
@@ -798,7 +847,11 @@ function selectChoice(option) {
   const choiceStep = runtimeStory[storyIndex];
   if (choiceStep.choiceResultCount) runtimeStory.splice(storyIndex + 1, choiceStep.choiceResultCount);
   const resultSprite = option.result.includes("도망") ? "emotion_blush" : option.result.includes("천천히") ? "emotion_smile" : "emotion_basic";
-  const resultScene = activeChapter.index === 4 ? { bg: "bg_festival", sprite: resultSprite } : {};
+  const resultScene = activeChapter.index === 4
+    ? { bg: "bg_festival", sprite: resultSprite }
+    : activeChapter.index === 2
+      ? { bg: "bg_school", sprite: resultSprite }
+      : {};
   choiceStep.choiceResultCount = 2;
   choiceStep.selectedOption = option.label;
   runtimeStory.splice(
@@ -879,7 +932,7 @@ function updatePreviousButton() {
 }
 
 function previousStory() {
-  if (!gameScreen.classList.contains("is-active") || storyIndex <= 0) return;
+  if (!gameScreen.classList.contains("is-active") || episodeCardActive || storyIndex <= 0) return;
   window.clearInterval(typingTimer);
   isTyping = false;
   awaitingChoice = false;
@@ -897,6 +950,12 @@ function previousStory() {
 
 function showStep(step, options = {}) {
   const renderToken = ++stepRenderToken;
+  const shouldShowEpisodeCard = Boolean(
+    !options.stateRestored
+      && step.chapter
+      && step.chapter.index > 0
+      && step.chapter.index !== activeChapter.index,
+  );
   let backgroundReady = options.backgroundReady || Promise.resolve(true);
   if (!options.stateRestored) {
     updateChapter(step.chapter);
@@ -914,35 +973,51 @@ function showStep(step, options = {}) {
   speakerName.classList.toggle("is-other", Boolean(step.speaker && !["N", "U"].includes(step.speaker)));
   dialogueText.classList.toggle("is-thought", Boolean(step.thought));
 
-  if (step.type === "phone") {
+  const revealStep = () => {
+    if (renderToken !== stepRenderToken) return;
+    if (step.type === "phone") {
+      window.clearInterval(typingTimer);
+      isTyping = false;
+      fullText = "";
+      dialogueBox.hidden = true;
+      if (!options.stateRestored) addPhoneMessage(step);
+    } else {
+      dialogueBox.hidden = false;
+      typeText(step.text);
+    }
+
+    if (step.sound) playSound(step.sound);
+    else stopActiveSound(false);
+    if (step.curtain === "reveal") {
+      Promise.resolve(backgroundReady).then(() => {
+        if (renderToken !== stepRenderToken) return;
+        setCurtainMode("none");
+        playEffect(step.effect);
+      });
+    } else {
+      playEffect(step.effect);
+    }
+    if (step.type === "choice") showChoice(step);
+    if (step.type === "answer") showAnswer();
+    updatePreviousButton();
+  };
+
+  if (shouldShowEpisodeCard) {
     window.clearInterval(typingTimer);
     isTyping = false;
     fullText = "";
     dialogueBox.hidden = true;
-    if (!options.stateRestored) addPhoneMessage(step);
+    choicePanel.hidden = true;
+    answerPanel.hidden = true;
+    stopActiveSound(false);
+    showEpisodeCard(step.chapter, revealStep);
   } else {
-    dialogueBox.hidden = false;
-    typeText(step.text);
+    revealStep();
   }
-
-  if (step.sound) playSound(step.sound);
-  else stopActiveSound(false);
-  if (step.curtain === "reveal") {
-    Promise.resolve(backgroundReady).then(() => {
-      if (renderToken !== stepRenderToken) return;
-      setCurtainMode("none");
-      playEffect(step.effect);
-    });
-  } else {
-    playEffect(step.effect);
-  }
-  if (step.type === "choice") showChoice(step);
-  if (step.type === "answer") showAnswer();
-  updatePreviousButton();
 }
 
 function advanceStory() {
-  if (!gameScreen.classList.contains("is-active") || endCard.classList.contains("is-visible") || awaitingChoice || awaitingAnswer) return;
+  if (!gameScreen.classList.contains("is-active") || episodeCardActive || endCard.classList.contains("is-visible") || awaitingChoice || awaitingAnswer) return;
   if (isTyping) {
     window.clearInterval(typingTimer);
     dialogueText.textContent = fullText;
@@ -967,6 +1042,7 @@ function goHome() {
   awaitingAnswer = false;
   choicePanel.hidden = true;
   answerPanel.hidden = true;
+  resetEpisodeCard();
   setPhoneOpen(false, true);
   stopActiveSound(true);
   previousButton.disabled = true;

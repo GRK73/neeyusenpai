@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a1b26" />
     <meta name="description" content="비주얼 노벨 니유 선배?" />
     <title>니유 선배?</title>
-    <link rel="stylesheet" href="styles.css?v=20260817-spritefix" />
+    <link rel="stylesheet" href="styles.css?v=20260919-episodecards" />
   </head>
   <body>
     <main id="app" class="app-shell">
@@ -59,6 +59,17 @@
           <div class="scene-vignette" aria-hidden="true"></div>
           <div id="scene-curtain" class="scene-curtain" aria-hidden="true"></div>
         </div>
+
+        <section id="episode-card" class="episode-card" aria-hidden="true">
+          <div class="episode-card-copy">
+            <p class="episode-card-kicker">NEEYU SENPAI?</p>
+            <div class="episode-card-heading">
+              <span id="episode-number">EP1.</span>
+              <h2 id="episode-title">면접</h2>
+            </div>
+            <div class="episode-card-line" aria-hidden="true"></div>
+          </div>
+        </section>
 
         <header class="game-toolbar">
           <div class="toolbar-controls">
@@ -158,6 +169,6 @@
     <audio id="sfx-squeak" preload="auto" src="data/sound/01_squeak.mp3"></audio>
     <audio id="sfx-bang" preload="auto" src="data/sound/02_bang.mp3"></audio>
     <script src="story-data.js?v=20260817-spritefix"></script>
-    <script src="game.js?v=20260817-spritefix"></script>
+    <script src="game.js?v=20260919-episodecards"></script>
   </body>
 </html>
